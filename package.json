@@ -1,0 +1,24 @@
+{
+  "name": "ds-gulp-builder",
+  "version": "0.0.1",
+  "description": "DelightSoft LLC gulpfile logic builder, which simplifies the process, keep code readable and lets avoid using separated configs, like gulp-starter project do..",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delightsoft/DSCommon3.git"
+  },
+  "keywords": [
+    "gulp",
+    "builder",
+    "delight",
+    "soft"
+  ],
+  "author": "Alexey Zorkaltsev (alexey@zorkaltsev.com)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/delightsoft/DSGulpBuilder/issues"
+  },
+  "homepage": "https://github.com/delightsoft/DSGulpBuilder#readme"
+}
