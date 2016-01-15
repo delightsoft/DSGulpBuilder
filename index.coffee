@@ -36,11 +36,9 @@ module.exports = ((gulp) ->
 
     go: ((tasks) ->
       tasks = turnTasksToNames(tasks)
-      console.info 'TaskBase._watchTask: ', TaskBase._watchTask
       if TaskBase._watchTask
         gulp.task 'watch', TaskBase._watchTask
         tasks.push 'watch'
-      console.info 'tasks: ', tasks
       gulp.task 'default', tasks)
 
     gutil: gutil
