@@ -23,9 +23,6 @@
   "homepage": "https://github.com/delightsoft/DSGulpBuilder#readme",
   "dependencies": {
     "array.prototype.find": "^1.0.0",
-    "gulp-autoprefixer": "^3.1.0",
-    "gulp-concat": "^2.6.0",
-    "object-assign": "^4.0.1",
     "browser-sync": "^2.10.0",
     "browserify": "^12.0.1",
     "coffee-script": "^1.10.0",
