@@ -48,6 +48,7 @@ module.exports =
             jade({locals: {dev: gutil.env.dev, min: if gutil.env.dev then '' else '.min'}})))
         p = @_onError p, 'finish'
         p = p.pipe(changed(@_destFirstLocation))
+        p = @_dest(p)
         p = @_endPipe p, 'finish', cb
 
         return false)

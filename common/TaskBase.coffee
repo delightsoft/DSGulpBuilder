@@ -61,13 +61,13 @@ module.exports =
       throw new Error("Definition of task '#{@_name}' is not completed")
       return)
 
-    _countFiles: ((p) ->
+    _countFiles: ((p, doNotSkipIncludeFiles) ->
       @_filesCnt = 0
       return p.pipe(through.obj((file, enc, cb) =>
         # count found files
         @_filesCnt++
         # skip files with name started with underscore
-        cb null, if !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file
+        cb null, if !doNotSkipIncludeFiles && !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file
         return))
       return)
 

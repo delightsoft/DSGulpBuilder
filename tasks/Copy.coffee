@@ -34,7 +34,7 @@ module.exports =
       GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         p = GLOBAL.gulp.src @_fixedSrc
-        p = @_countFiles p
+        p = @_countFiles p, true
         p = p.pipe(changed(@_destFirstLocation))
         p = @_dest p
         p = @_onError p, 'finish'
