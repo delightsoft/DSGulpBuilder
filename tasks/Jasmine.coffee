@@ -2,10 +2,11 @@ path = require 'path'
 gutil = require 'gulp-util'
 jasmine = require 'gulp-jasmine'
 through = require 'through2'
+changed = require 'gulp-changed'
 
 preprocessPath = require '../common/preprocessPath'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, handleErrors} = require '../common/TaskBase'
+{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
 
 module.exports =
 
@@ -17,15 +18,10 @@ module.exports =
       TaskBase.call @, task
       throw new Error 'Invalid source file or directory name (1st argument)' unless typeof @_src == 'string' && @_src != ''
       @_opts = opts
-#      @_opts = R.merge {
-#          includeStackTrace: true # Zork: It gives useless callstack - don't see test source line
-##          isVerbose: false
-##          config: ...goes to jasmine
-#        }, (opts || {})
-
       {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, '/**/*.*'
       return)
 
+    # If you want tests run be theirself (not as dependency), use this method to specify sources that are tested
     watch: ((path) ->
       invalidOptionType('dest', 'string') unless typeof path == 'string' && path.trim() != ''
       @_watchSrc = path
@@ -36,29 +32,19 @@ module.exports =
 
       @_mixinAssert?()
 
-      GLOBAL.gulp.task @_name, @_deps, ((callback) =>
+      TaskBase.addToWatch (=>
+        GLOBAL.gulp.watch @_fixedSrc, [@_name]
+        if @_watchSrc
+          GLOBAL.gulp.watch @_watchSrc, [@_name]
+        return)
 
-        callback = @_setWatch callback, (=>
-          GLOBAL.gulp.watch @_fixedSrc, [@_name]
-          if @_watchSrc
-            console.info '@_watchSrc: ', @_watchSrc
-            GLOBAL.gulp.watch @_watchSrc, [@_name]
-          return)
-
-        cnt = 0
+      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         p = GLOBAL.gulp.src @_fixedSrc # Note: _src is used intentionally
-        .pipe(through.obj((file, enc, cb) =>
-            cnt++ # count found files
-            cb null, if !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file # skip files with name started with underscore
-            return))
-        .pipe(jasmine(@_opts))
-        .on('error', handleErrors)
-        .on 'finish', (=> # Zork: Here I MUST use 'finish' (not 'end'), since I observer the following: without errors in test - I've got no 'end' event, but with errors - I've got TWO 'end's
-          if cnt == 0
-            gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
-          callback()
-          return)
+        p = @_countFiles p
+        p = p.pipe(jasmine(@_opts))
+        p = @_onError p, 'finish', true
+        p = @_endPipe p, 'finish', cb
 
         return false)
 

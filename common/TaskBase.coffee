@@ -1,20 +1,13 @@
+path = require 'path'
+
 gutil = require 'gulp-util'
 rename = require 'gulp-rename'
-notify = require 'gulp-notify'
+(notify = require 'gulp-notify').logger (->)
 
 ForkStream = require 'fork-stream'
 through = require 'through2'
 
 module.exports =
-
-  handleErrors: (->
-    args = Array::slice.call arguments
-    notify.onError(
-      title: 'Compile Error'
-      message: '<%= error %>'
-    ).apply this, args
-    @emit 'end'
-    return)
 
   tooManyArgs: tooManyArgs = (->
     throw new Error 'Too many arguments'
@@ -50,7 +43,6 @@ module.exports =
             break unless (ok = dep instanceof TaskBase)
             @_deps[i] = dep._build()
       if !ok
-        console.info '@_deps: ', @_deps
         throw new Error 'Invalid list of dependencies (2nd argument)'
       @_built = false
       @_watch = false
@@ -69,24 +61,53 @@ module.exports =
       throw new Error("Definition of task '#{@_name}' is not completed")
       return)
 
-    _setWatch: ((callback, initWatch) ->
-      if @_watch
-        newCallback = callback
+    _countFiles: ((p) ->
+      @_filesCnt = 0
+      return p.pipe(through.obj((file, enc, cb) =>
+        # count found files
+        @_filesCnt++
+        # skip files with name started with underscore
+        cb null, if !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file
+        return))
+      return)
+
+    _onError: ((p, endOrFinish, doNotEmitEvent) ->
+      self = @
+      delete @_err # clear from previous use
+      return p.on 'error', ((err) ->
+        args = Array::slice.call arguments
+        notify.onError(
+          title: "Task '#{self._name}': Error"
+          message: '<%= error %>'
+        ).apply @, args
+        self._err = err
+        @emit endOrFinish unless doNotEmitEvent
+        return))
+
+    _endPipe: ((p, endOrFinish, cb) ->
+      return p.on endOrFinish, ((err) =>
+        if @hasOwnProperty '_filesCnt' && @_filesCnt == 0
+          gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
+        cb(if @_err then new gutil.PluginError @_name, @_err else null)
+        return))
+
+    _setWatch: ((cb, initWatch) ->
+      return if @_watch
+        cb
       else
-        newCallback = ((err) =>
+        ((err) =>
           initWatch()
           @_watch = true
-          callback(err)
-          return)
-      # Zork: In some cases we receive duplicated 'end' event.  This is a protection from such cases
-      return do (invoked = false) =>
-        ((err) =>
-          if invoked
-            gutil.log gutil.colors.red "Task '#{@_name}': Duplicated 'end' event had to happen"
-          else
-            invoked = true
-            newCallback err
+          cb err
           return))
+
+    # Hack: I collect all watches right on the TaskBase class method
+    @addToWatch = ((watch) ->
+      [oldWatchTask, @_watchTask] = [@_watchTask, (->
+        oldWatchTask?.call @
+        watch()
+        return)]
+      return)
 
     @destMixin = (->
 
@@ -117,19 +138,21 @@ module.exports =
         else
           ((src) =>
             endsExpected = locations.length
-            resultPipe = src.pipe(through.obj((file, enc, cb) -> # clone file
-              cb null, file.clone()
-              return))
-            .on 'end', (onEnd = (-> # count 'end' events on duplicated pipes
-              if --endsExpected == 0 then outStream.emit 'end'
-              return))
-            .pipe(outStream = GLOBAL.gulp.dest(locations[0]), end: false) # suppress 'end' event
+            resultPipe = src.pipe(GLOBAL.gulp.dest(locations[0]))
+            [oldEmit, resultPipe.emit] = [resultPipe.emit,
+              ((event) ->
+                if event == 'finish' then onFinish() # intercept 'finish'
+                else oldEmit.apply resultPipe, arguments
+                return)]
+            onFinish = (-> # consolidates all 'finish' events for all destinations
+              oldEmit.call resultPipe, 'finish' if --endsExpected == 0
+              return)
             for location in locations[1..]
               src.pipe(through.obj((file, enc, cb) -> # clone file
                 cb null, file.clone()
                 return))
               .pipe(GLOBAL.gulp.dest(location)) # save file
-              .on 'end', onEnd
+              .on 'finish', onFinish
             return resultPipe)
 
         @_destFirstLocation = locations[0]

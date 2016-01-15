@@ -14,7 +14,7 @@ ternaryStream = require 'ternary-stream'
 
 preprocessPath = require '../common/preprocessPath'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, handleErrors} = require '../common/TaskBase'
+{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
 
 module.exports =
 
@@ -35,32 +35,21 @@ module.exports =
 
       @_mixinAssert?()
 
-      GLOBAL.gulp.task @_name, @_deps, ((callback) =>
+      TaskBase.addToWatch (=>
+        GLOBAL.gulp.watch @_fixedSrc, [@_name]
+        return)
 
-        callback = @_setWatch callback, (=>
-          GLOBAL.gulp.watch @_fixedSrc, [@_name]
-          return)
-
-        cnt = 0
+      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         p = GLOBAL.gulp.src @_fixedSrc
-        .pipe(through.obj((file, enc, cb) =>
-            cnt++ # count found files
-            cb null, if !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file # skip files with name started with underscore
-            return))
-        .pipe(ternaryStream(((file) ->
+        p = @_countFiles p
+        p = p.pipe(ternaryStream(((file) ->
               minimatch(file.relative, '**/*.+(jade|html)')),
             jade({locals: {dev: gutil.env.dev, min: if gutil.env.dev then '' else '.min'}})))
-        .pipe(changed(@_destFirstLocation))
+        p = @_onError p, 'finish'
+        p = p.pipe(changed(@_destFirstLocation))
+        p = @_endPipe p, 'finish', cb
 
-        p = @_dest(p)
-
-        p.on("error", handleErrors)
-        .on 'end', (=>
-          if cnt == 0
-            gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
-          callback()
-          return)
         return false)
 
       @_built = true

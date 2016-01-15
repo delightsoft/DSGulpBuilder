@@ -1,6 +1,7 @@
 # TODO: Make gulp.watch watching new files (switch to https://www.npmjs.com/package/gulp-watch)
 # TODO: Jasmine task should block dependets
 # TODO: Jasmine task should take source files from dependent tasks
+# TODO: Optimize watch strategy - i.e. ngJade2js should not watch by itself if takes sources from the same folder as Browserify, which has ngJade2js task in dependencies.  Otherwise ngJade2js gets called twice
 
 require './common/polyfills' # must go first
 GLOBAL.R = require 'ramda'
@@ -33,7 +34,14 @@ module.exports = ((gulp) ->
 
     sync: ((tasks, name) -> gulpsync.sync turnTasksToNames(tasks), name)
 
-    go: ((tasks) -> gulp.task 'default', turnTasksToNames(tasks))
+    go: ((tasks) ->
+      tasks = turnTasksToNames(tasks)
+      console.info 'TaskBase._watchTask: ', TaskBase._watchTask
+      if TaskBase._watchTask
+        gulp.task 'watch', TaskBase._watchTask
+        tasks.push 'watch'
+      console.info 'tasks: ', tasks
+      gulp.task 'default', tasks)
 
     gutil: gutil
   })

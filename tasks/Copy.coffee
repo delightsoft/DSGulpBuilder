@@ -6,7 +6,7 @@ changed = require 'gulp-changed'
 
 preprocessPath = require '../common/preprocessPath'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, handleErrors} = require '../common/TaskBase'
+{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
 
 module.exports =
 
@@ -27,29 +27,19 @@ module.exports =
 
       @_mixinAssert?()
 
-      GLOBAL.gulp.task @_name, @_deps, ((callback) =>
+      TaskBase.addToWatch (=>
+        GLOBAL.gulp.watch @_fixedSrc, [@_name]
+        return)
 
-        callback = @_setWatch callback, (=>
-          GLOBAL.gulp.watch @_fixedSrc, [@_name]
-          return)
-
-        cnt = 0
+      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         p = GLOBAL.gulp.src @_fixedSrc
-        .pipe(through.obj((file, enc, cb) =>
-          cnt++ # count found files
-          cb null, file
-          return))
-        .pipe(changed(@_destFirstLocation))
+        p = @_countFiles p
+        p = p.pipe(changed(@_destFirstLocation))
+        p = @_dest p
+        p = @_onError p, 'finish'
+        p = @_endPipe p, 'finish', cb
 
-        p = @_dest(p)
-
-        p.on("error", handleErrors)
-        .on 'end', (=>
-          if cnt == 0
-            gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
-          callback()
-          return)
         return false)
 
       @_built = true

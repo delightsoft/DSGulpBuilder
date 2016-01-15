@@ -1,7 +1,7 @@
 fs = require 'fs'
 rimraf = require 'rimraf'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, handleErrors} = require '../common/TaskBase'
+{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
 
 module.exports =
 

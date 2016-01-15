@@ -12,7 +12,7 @@ changed = require 'gulp-changed'
 
 preprocessPath = require '../common/preprocessPath'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, handleErrors} = require '../common/TaskBase'
+{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
 
 module.exports =
 
@@ -58,11 +58,11 @@ module.exports =
         for v in @_includePaths
           watchList.push "#{path.dirname(v)}/**/*.sass"
 
-      GLOBAL.gulp.task @_name, @_deps, ((callback) =>
+      TaskBase.addToWatch (=>
+        GLOBAL.gulp.watch watchList, [@_name]
+        return)
 
-        callback = @_setWatch callback, (=>
-          GLOBAL.gulp.watch watchList, [@_name]
-          return)
+      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         sassOpts =
           sourceComments: "map"
@@ -71,32 +71,24 @@ module.exports =
 
         sassOpts.includePaths = @_includePaths if @_includePaths
 
-        cnt = 0
-
         p = GLOBAL.gulp.src @_fixedSrc
-        .pipe(through.obj((file, enc, cb) =>
-            cnt++ # count found files
-            cb null, if !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file # skip files with name started with underscore
-            return))
-        .pipe(sass(sassOpts))
-        .pipe(autoprefixer(browsers: ["last 10 version"]))
+        p = @_countFiles p
+        p = p.pipe(sass(sassOpts))        
+        p = p.pipe(autoprefixer(browsers: ["last 10 version"]))
+        p = @_onError p, 'finish'
 
         if @_debug
           p.pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest))
-          p = @_dest(p)
+          p = @_dest p
 
         if @_minimize
           p = p.pipe(cssNano())
           .pipe(rename(extname: '.min.css'))
           p = p.pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest)) if !@_debug
-          p = @_dest(p)
+          p = @_dest p
 
-        p.on('error', handleErrors)
-        .on 'end', (=>
-          if cnt == 0
-            gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
-          callback()
-          return)
+        p = @_endPipe p, 'finish', cb
+        
         return false)
 
       @_built = true

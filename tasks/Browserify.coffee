@@ -5,7 +5,7 @@ source = require 'vinyl-source-stream2'
 rename = require 'gulp-rename'
 changed = require 'gulp-changed'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, handleErrors} = require '../common/TaskBase'
+{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
 
 module.exports =
 
@@ -39,11 +39,11 @@ module.exports =
 
       @_mixinAssert?()
 
-      GLOBAL.gulp.task @_name, @_deps, ((callback) =>
+      TaskBase.addToWatch (=>
+        GLOBAL.gulp.watch @_src, [@_name]
+        return)
 
-        callback = @_setWatch callback, (=>
-          GLOBAL.gulp.watch @_src, [@_name]
-          return)
+      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         # Note: https://github.com/substack/node-browserify/wiki/list-of-transforms
 
@@ -59,7 +59,7 @@ module.exports =
         .transform(require('coffeeify'))
 
         p = bundler.bundle()
-        .on('error', handleErrors)
+        p = @_onError p, 'finish'
 
         if @_debug
           p = p.pipe(source(@_src)) # for some reason, bundler do not translate source name from 'entries' parameter
@@ -68,12 +68,12 @@ module.exports =
           p = @_dest(p)
 
         if @_minimize
-          p = p.pipe(rename(extname: '.min.js'))
-          .pipe(uglify())
+          p = p.pipe(rename(extname: '.min.js')).pipe(uglify())
           p = p.pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest)) if !@_debug
           p = @_dest(p)
 
-        p.on 'end', callback
+        p = @_endPipe p, 'finish', cb
+
         return false)
 
       @_built = true
