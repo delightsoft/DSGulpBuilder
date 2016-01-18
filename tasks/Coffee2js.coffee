@@ -42,7 +42,7 @@ module.exports =
       GLOBAL.gulp.task @_name, @_deps, ((cb) =>
 
         p = GLOBAL.gulp.src @_fixedSrc
-        p = @_countFiles p
+        p = @_countFiles p, true
         p = p.pipe(ternaryStream(((file) ->
           minimatch(file.relative, '**/*.+(coffee|litcoffee|coffee.md)')),
           coffee(bare: true)))
