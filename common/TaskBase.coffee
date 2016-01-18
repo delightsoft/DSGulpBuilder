@@ -84,11 +84,14 @@ module.exports =
         @emit endOrFinish unless doNotEmitEvent
         return))
 
-    _endPipe: ((p, endOrFinish, cb) ->
+    _endPipe: ((p, endOrFinish, cb, ignoreSecondEnd) ->
+      endHappend = false
       return p.on endOrFinish, ((err) =>
         if @hasOwnProperty '_filesCnt' && @_filesCnt == 0
           gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
-        cb(if @_err then new gutil.PluginError @_name, @_err else null)
+        unless endHappend && ignoreSecondEnd
+          cb(if @_err then new gutil.PluginError @_name, @_err else null)
+        endHappend = true
         return))
 
     _setWatch: ((cb, initWatch) ->
