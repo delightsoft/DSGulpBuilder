@@ -23,7 +23,7 @@ module.exports =
       tooManyArgs() if arguments.length > 3
       TaskBase.call @, task
       throw new Error 'Invalid source file name (1st argument)' unless typeof @_src == 'string' && @_src != ''
-      {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*.sass"
+      {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*.+(sass|scss)"
       @_minimize = true
       @_debug = true
       @_includePaths = null
@@ -56,7 +56,7 @@ module.exports =
       watchList = [@_fixedSrc]
       if @_includePaths
         for v in @_includePaths
-          watchList.push "#{path.dirname(v)}/**/*.sass"
+          watchList.push "#{path.dirname(v)}/**/*.+(sass|scss)"
 
       TaskBase.addToWatch (=>
         GLOBAL.gulp.watch watchList, [@_name]
