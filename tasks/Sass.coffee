@@ -39,7 +39,7 @@ module.exports =
                 @_debug = v
               when 'includePaths'
                 for s in (if Array.isArray v then v else [v])
-                  break unless (ok typeof v == 'string')
+                  break unless (ok = typeof v == 'string')
                 invalidOptionType k, 'string or array of strings' unless ok
                 @_includePaths = v
               else unsupportedOption k

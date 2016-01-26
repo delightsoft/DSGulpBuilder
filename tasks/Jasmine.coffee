@@ -44,17 +44,6 @@ module.exports =
         p = @_countFiles p
         p = p.pipe(jasmine(@_opts))
 
-#        logAllEmitterEvents = ((eventEmitter) ->
-#          emitToLog = eventEmitter.emit
-#          eventEmitter.emit = (->
-#            event = arguments[0];
-#            console.log("event emitted: " + event);
-#            emitToLog.apply(eventEmitter, arguments)
-#            return)
-#          return)
-#
-#        logAllEmitterEvents p
-
         p = @_onError p, 'end', true
         p = @_endPipe p, 'end', cb, true # TODO: This works only with fixed gulp-jasmine - https://github.com/Zork33/gulp-jasmine.git
 

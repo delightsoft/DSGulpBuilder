@@ -1,3 +1,5 @@
+path = require 'path'
+fs = require 'fs'
 browserSync = require 'browser-sync'
 
 {TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
@@ -54,16 +56,16 @@ module.exports =
             # Exclude Map files
             "!#{@_src}/**.map"
           ]
-          middleware: ((req, res, next) ->
+          middleware: ((req, res, next) =>
             if req.headers.accept?.indexOf('text/html') >= 0
               url = String req.url
-              if url.indexOf('browser-sync-client') < 0
+              if url.indexOf('browser-sync-client') == -1
                 if @_debug
                   console.log "url: #{url}"
                 if url.charAt(url.length - 1) == '/'
                   url = url.substr(0, url.length - 1)
                 try
-                  stats = fs.statSync(filePath = dest + url)
+                  stats = fs.statSync(filePath = path.join(@_src, url))
                   if stats.isDirectory()
                     try
                       stats = fs.statSync(filePath += '/index.html')
