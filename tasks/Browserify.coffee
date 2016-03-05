@@ -12,19 +12,19 @@ module.exports =
   class Browserify extends TaskBase
 
     constructor: ((task, @_src, opts) ->
-      missingArg() if arguments.length == 1
+      missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 3
       TaskBase.call @, task
       throw new Error 'Invalid source file name (1st argument)' unless typeof @_src == 'string' && @_src != ''
-      @_minimize = true
+      @_min = true
       @_debug = true
       if arguments.length > 2
         if (ok = typeof opts == 'object')
           for k, v of opts
             switch k
-              when 'minimize'
+              when 'min'
                 invalidOptionType k, 'boolean' unless typeof v == 'boolean'
-                @_minimize = v
+                @_min = v
               when 'debug'
                 invalidOptionType k, 'boolean' unless typeof v == 'boolean'
                 @_debug = v
@@ -67,7 +67,7 @@ module.exports =
           .pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest))
           p = @_dest(p)
 
-        if @_minimize
+        if @_min
           p = p.pipe(rename(extname: '.min.js')).pipe(uglify())
           p = p.pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest)) if !@_debug
           p = @_dest(p)

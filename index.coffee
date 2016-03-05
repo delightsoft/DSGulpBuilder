@@ -42,4 +42,13 @@ module.exports = ((gulp) ->
       gulp.task 'default', tasks)
 
     gutil: gutil
+
+    errorHandler: (taskName) ->
+      throw new Error 'Invalid argument \'taskName\'' unless typeof taskName == 'string' && taskName.length > 0
+      -> # pipe.on 'error' handler
+        notify.onError
+          title: "Task '#{taskName}': Error"
+          message: '<%= error %>'
+        .apply @, Array::slice.call arguments
+        return
   })

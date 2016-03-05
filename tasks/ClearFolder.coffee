@@ -8,7 +8,7 @@ module.exports =
   class ClearFolder extends TaskBase
 
     constructor: ((task, @_folder) ->
-      missingArg() if arguments.length == 1
+      missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 2
       TaskBase.call @, task
       @_keep = []

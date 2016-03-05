@@ -13,7 +13,7 @@ module.exports =
   class Copy extends TaskBase
 
     constructor: ((task, @_src) ->
-      missingArg() if arguments.length == 1
+      missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 2
       TaskBase.call @, task
       throw new Error 'Invalid source file or directory name (1st argument)' unless typeof @_src == 'string' && @_src != ''
