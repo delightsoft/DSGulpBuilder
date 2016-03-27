@@ -67,7 +67,8 @@ module.exports =
         locals = 
           dev: !!gutil.env.dev
           min: if gutil.env.dev then '' else '.min'
-        locals = ramda.merge locals, @_locals if @_locals 
+
+        locals = ramda.merge locals, @_locals if @_locals
         
         p = GLOBAL.gulp.src @_fixedSrc
         p = @_countFiles p

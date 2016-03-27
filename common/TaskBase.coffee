@@ -81,6 +81,7 @@ module.exports =
           message: '<%= error %>'
         ).apply @, args
         self._err = err
+        console.error err.stack
         @emit endOrFinish unless doNotEmitEvent
         return))
 
