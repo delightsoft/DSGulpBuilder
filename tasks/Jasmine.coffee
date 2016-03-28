@@ -65,21 +65,21 @@ module.exports =
 
         jasmine = new JasmineRunner
 
-        if @opts
+        if @_opts
 
-          if @opts.hasOwnProperty('timeout')
-            jasmine.jasmine.DEFAULT_TIMEOUT_INTERVAL = @opts.timeout
+          if @_opts.hasOwnProperty('timeout')
+            jasmine.jasmine.DEFAULT_TIMEOUT_INTERVAL = @_opts.timeout
 
-          if @opts.hasOwnProperty('config')
-            jasmine.loadConfig @opts.config
+          if @_opts.hasOwnProperty('config')
+            jasmine.loadConfig @_opts.config
 
         jasmine.addReporter new JasmineReporter
 
-          isVerbose: if @opts then @opts.verbose else false
+          isVerbose: if @_opts then @_opts.verbose else false
 
-          showColors: if @opts then @opts.showColors else true
+          showColors: if @_opts then @_opts.showColors else true
 
-          includeStackTrace: if @opts then @opts.includeStackTrace else false
+          includeStackTrace: if @_opts then @_opts.includeStackTrace else false
 
         p = p.pipe through.obj ((file, enc, cb) ->
 
