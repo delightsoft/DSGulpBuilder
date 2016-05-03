@@ -1,7 +1,7 @@
 fs = require 'fs'
 rimraf = require 'rimraf'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
+{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
 
 module.exports =
 
@@ -43,7 +43,7 @@ module.exports =
                 return
               throw new Error err
             n = 0
-            for file in files when not @_keep.find ((s) -> s == file)
+            for file in files when not file in @_keep
               do (file) =>
                 n++
                 rimraf "#{@_folder}/#{file}", (->

@@ -8,7 +8,7 @@ preprocessPath = require '../common/preprocessPath'
 JasmineRunner = require 'jasmine'
 JasmineReporter = require 'jasmine-terminal-reporter'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
+{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
 
 gutil = require('gulp-util')
 

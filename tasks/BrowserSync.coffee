@@ -2,7 +2,7 @@ path = require 'path'
 fs = require 'fs'
 browserSync = require 'browser-sync'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
+{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
 
 module.exports =
 

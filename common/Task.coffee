@@ -1,6 +1,6 @@
 path = require 'path'
 
-{TaskBase} = require './TaskBase'
+TaskBase = require './TaskBase'
 
 module.exports =
 

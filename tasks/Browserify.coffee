@@ -5,7 +5,7 @@ source = require 'vinyl-source-stream2'
 rename = require 'gulp-rename'
 changed = require 'gulp-changed'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
+{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
 
 module.exports =
 

@@ -6,7 +6,7 @@ changed = require 'gulp-changed'
 
 preprocessPath = require '../common/preprocessPath'
 
-{TaskBase, tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = require '../common/TaskBase'
+{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
 
 module.exports =
 

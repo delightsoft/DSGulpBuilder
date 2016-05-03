@@ -3,10 +3,7 @@
 # TODO: Jasmine task should take source files from dependent tasks
 # TODO: Optimize watch strategy - i.e. ngJade2js should not watch by itself if takes sources from the same folder as Browserify, which has ngJade2js task in dependencies.  Otherwise ngJade2js gets called twice
 
-require './common/polyfills' # must go first
-GLOBAL.R = require 'ramda'
-
-{TaskBase} = require './common/TaskBase'
+TaskBase = require './common/TaskBase'
 Task = require './common/Task'
 
 turnTasksToNames = ((tasks) ->
@@ -27,6 +24,10 @@ module.exports = ((gulp) ->
   gulpsync = require('gulp-sync')(gulp)
 
   return {
+
+    TaskBase: TaskBase
+
+    Task: Task
 
     task: ((taskname, deps) -> new Task(taskname, deps))
 
