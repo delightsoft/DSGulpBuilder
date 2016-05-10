@@ -43,7 +43,7 @@ module.exports =
                 return
               throw new Error err
             n = 0
-            for file in files when not file in @_keep
+            for file in files when not (file in @_keep)
               do (file) =>
                 n++
                 rimraf "#{@_folder}/#{file}", (->
