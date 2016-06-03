@@ -79,6 +79,8 @@ module.exports =
 
           showColors: if @_opts then @_opts.showColors else true
 
+          stackFilter: if @_opts then @_opts.stackFilter else true
+
           includeStackTrace: if @_opts then @_opts.includeStackTrace else false
 
         p = p.pipe through.obj ((file, enc, cb) ->
