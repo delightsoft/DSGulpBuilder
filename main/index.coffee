@@ -5,8 +5,6 @@ Task = require './common/Task'
 
 turnTasksToNames = ((tasks) ->
   if (ok = Array.isArray tasks)
-    for task, i in tasks by -1 when task instanceof StubTask
-      tasks.splice i, 1
     for task, i in tasks
       if Array.isArray task # inner array
         turnTasksToNames task
@@ -38,9 +36,12 @@ module.exports = (gulp) ->
 
       if Task.missingModules.length > 0
         if Task.missingModules.length == 1
-          console.error "To proceed you need to install an optional module.  Please, run 'npm install #{Task.missingModules[0]} --save-dev'"
+          console.error gutil.colors.red "To proceed you need to install an optional module.  Please, run:"
+          console.error gutil.colors.yellow "npm install #{Task.missingModules[0]} --save-dev"
         else
-          console.error "To proceed you need to install few optional modules.  Please, run 'npm install #{Task.missingModules.join ' '} --save-dev'"
+          console.error gutil.colors.red "To proceed you need to install few optional modules.  Please, run:"
+          Task.missingModules.sort()
+          console.error gutil.colors.yellow "npm install #{Task.missingModules.join ' '} --save-dev"
         return
 
       tasks = turnTasksToNames(tasks)
