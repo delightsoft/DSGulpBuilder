@@ -2,11 +2,11 @@ path = require 'path'
 fs = require 'fs'
 browserSync = require 'browser-sync'
 
-{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
+module.exports = (DSGulpBuilder) ->
 
-module.exports =
+  {invalidArg, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, preprocessPath} = TaskBase = DSGulpBuilder.TaskBase
 
-  class Browserify extends TaskBase
+  class BrowserSync extends TaskBase
 
     constructor: ((task, @_src, opts) ->
       missingArg() if arguments.length < 2
@@ -91,3 +91,14 @@ module.exports =
 
       @_built = true
       return @_name)
+
+# ----------------------------
+
+  DSGulpBuilder.Task::browserSync = ->
+    newInstance = Object.create(BrowserSync::)
+    args = [@]
+    args.push arg for arg in arguments
+    BrowserSync.apply newInstance, args
+    return newInstance
+
+  return        

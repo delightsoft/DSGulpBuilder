@@ -5,9 +5,9 @@ source = require 'vinyl-source-stream2'
 rename = require 'gulp-rename'
 changed = require 'gulp-changed'
 
-{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
+module.exports = (DSGulpBuilder) ->
 
-module.exports =
+  {invalidArg, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, preprocessPath} = TaskBase = DSGulpBuilder.TaskBase
 
   class Browserify extends TaskBase
 
@@ -78,3 +78,14 @@ module.exports =
 
       @_built = true
       return @_name)
+
+# ----------------------------
+
+  DSGulpBuilder.Task::browserify = ->
+    newInstance = Object.create(Browserify::)
+    args = [@]
+    args.push arg for arg in arguments
+    Browserify.apply newInstance, args
+    return newInstance
+
+  return    

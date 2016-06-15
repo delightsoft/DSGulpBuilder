@@ -1,27 +1,20 @@
 path = require 'path'
-browserify = require 'browserify'
-watchify = require 'watchify'
-uglify = require 'gulp-uglify'
-source = require 'vinyl-source-stream2'
 rename = require 'gulp-rename'
 sass = require 'gulp-sass'
 cssNano = require 'gulp-cssnano'
-through = require 'through2'
 autoprefixer = require 'gulp-autoprefixer'
 changed = require 'gulp-changed'
 
-preprocessPath = require '../common/preprocessPath'
+module.exports = (DSGulpBuilder) ->
 
-{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
-
-module.exports =
+  {invalidArg, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, preprocessPath} = TaskBase = DSGulpBuilder.TaskBase
 
   class Sass extends TaskBase
 
-    constructor: ((task, @_src, opts) ->
+    constructor: (task, @_src, opts) ->
       missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 3
-      TaskBase.call @, task
+      super task
       throw new Error 'Invalid source file name (1st argument)' unless typeof @_src == 'string' && @_src != ''
       {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*.+(sass|scss)"
       @_minimize = true
@@ -44,7 +37,6 @@ module.exports =
                 @_includePaths = v
               else unsupportedOption k
         throw new Error 'Invalid options (2nd argument)' unless ok
-      return)
 
     @destMixin()
 
@@ -93,3 +85,14 @@ module.exports =
 
       @_built = true
       return @_name)
+    
+# ----------------------------
+
+  DSGulpBuilder.Task::sass = ->
+    newInstance = Object.create(Sass::)
+    args = [@]
+    args.push arg for arg in arguments
+    Sass.apply newInstance, args
+    return newInstance
+
+  return

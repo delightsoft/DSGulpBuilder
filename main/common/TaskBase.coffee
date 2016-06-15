@@ -1,10 +1,7 @@
 path = require 'path'
-
 gutil = require 'gulp-util'
 rename = require 'gulp-rename'
 (notify = require 'gulp-notify').logger (->)
-
-ForkStream = require 'fork-stream'
 through = require 'through2'
 
 class TaskBase

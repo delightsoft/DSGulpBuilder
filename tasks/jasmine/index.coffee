@@ -1,16 +1,9 @@
 path = require 'path'
 gutil = require 'gulp-util'
 through = require 'through2'
-changed = require 'gulp-changed'
-
-preprocessPath = require '../common/preprocessPath'
 
 JasmineRunner = require 'jasmine'
 JasmineReporter = require 'jasmine-terminal-reporter'
-
-{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
-
-gutil = require('gulp-util')
 
 deleteRequireCache = (id) ->
 
@@ -28,8 +21,10 @@ deleteRequireCache = (id) ->
 
   return
 
-module.exports =
+module.exports = (DSGulpBuilder) ->
 
+  {invalidArg, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, preprocessPath} = TaskBase = DSGulpBuilder.TaskBase
+  
   class Jasmine extends TaskBase
 
     constructor: ((task, @_src, opts) ->
@@ -117,3 +112,14 @@ module.exports =
 
       @_built = true
       return @_name)
+
+# ----------------------------
+
+  DSGulpBuilder.Task::jasmine = ->
+    newInstance = Object.create(Jasmine::)
+    args = [@]
+    args.push arg for arg in arguments
+    Jasmine.apply newInstance, args
+    return newInstance
+
+  return

@@ -1,13 +1,12 @@
-# TODO: Make gulp.watch watching new files (switch to https://www.npmjs.com/package/gulp-watch)
-# TODO: Jasmine task should block dependets
-# TODO: Jasmine task should take source files from dependent tasks
-# TODO: Optimize watch strategy - i.e. ngJade2js should not watch by itself if takes sources from the same folder as Browserify, which has ngJade2js task in dependencies.  Otherwise ngJade2js gets called twice
-
+gutil = require 'gulp-util'
 TaskBase = require './common/TaskBase'
 Task = require './common/Task'
+{StubTask} = require './externalTasks'
 
 turnTasksToNames = ((tasks) ->
   if (ok = Array.isArray tasks)
+    for task, i in tasks by -1 when task instanceof StubTask
+      tasks.splice i, 1
     for task, i in tasks
       if Array.isArray task # inner array
         turnTasksToNames task
@@ -17,13 +16,13 @@ turnTasksToNames = ((tasks) ->
   throw new Error 'Invalid list of tasks' if !ok
   return tasks)
 
-module.exports = ((gulp) ->
+module.exports = (gulp) ->
 
   GLOBAL.gulp = gulp
   gutil = require 'gulp-util'
   gulpsync = require('gulp-sync')(gulp)
 
-  return {
+  DSGulpBuilder = {
 
     TaskBase: TaskBase
 
@@ -36,6 +35,14 @@ module.exports = ((gulp) ->
     sync: ((tasks, name) -> gulpsync.sync turnTasksToNames(tasks), name)
 
     go: ((tasks) ->
+
+      if Task.missingModules.length > 0
+        if Task.missingModules.length == 1
+          console.error "To proceed you need to install an optional module.  Please, run 'npm install #{Task.missingModules[0]} --save-dev'"
+        else
+          console.error "To proceed you need to install few optional modules.  Please, run 'npm install #{Task.missingModules.join ' '} --save-dev'"
+        return
+
       tasks = turnTasksToNames(tasks)
       if TaskBase._watchTask
         gulp.task 'watch', TaskBase._watchTask
@@ -52,4 +59,8 @@ module.exports = ((gulp) ->
           message: '<%= error %>'
         .apply @, Array::slice.call arguments
         return
-  })
+  }
+  
+  Task::_DSGulpBuilder = DSGulpBuilder 
+  
+  DSGulpBuilder # module.exports = (gulp) ->

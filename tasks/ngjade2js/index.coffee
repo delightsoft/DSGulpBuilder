@@ -1,12 +1,6 @@
 path = require 'path'
 gutil = require 'gulp-util'
-browserify = require 'browserify'
-watchify = require 'watchify'
-uglify = require 'gulp-uglify'
-source = require 'vinyl-source-stream2'
-rename = require 'gulp-rename'
 jade = require 'gulp-jade'
-through = require 'through2'
 changed = require 'gulp-changed'
 
 ngHtml2js = require 'gulp-ng-html2js'
@@ -15,13 +9,11 @@ concat = require 'gulp-concat'
 minimatch = require 'minimatch'
 ternaryStream = require 'ternary-stream'
 
-preprocessPath = require '../common/preprocessPath'
+module.exports = (DSGulpBuilder) ->
 
-{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
+  {invalidArg, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, preprocessPath} = TaskBase = DSGulpBuilder.TaskBase
 
-module.exports =
-
-  class NgHtml2JS extends TaskBase
+  class NgJade2JS extends TaskBase
 
     constructor: ((task, @_src, opts) ->
       missingArg() if arguments.length < 2
@@ -69,3 +61,14 @@ module.exports =
 
       @_built = true
       return @_name)
+
+# ----------------------------
+
+  DSGulpBuilder.Task::ngJade2JS = ->
+    newInstance = Object.create(NgJade2JS::)
+    args = [@]
+    args.push arg for arg in arguments
+    NgJade2JS.apply newInstance, args
+    return newInstance
+
+  return    

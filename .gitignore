@@ -1,7 +1,7 @@
+.git
 .sass-cache
 .svn
 .idea
 .iml
 .ipr
-build
 node_modules

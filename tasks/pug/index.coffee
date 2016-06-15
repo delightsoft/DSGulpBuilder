@@ -1,31 +1,23 @@
 path = require 'path'
 gutil = require 'gulp-util'
-browserify = require 'browserify'
-watchify = require 'watchify'
-uglify = require 'gulp-uglify'
-source = require 'vinyl-source-stream2'
-rename = require 'gulp-rename'
-jade = require 'gulp-jade'
+pug = require 'gulp-pug'
 through = require 'through2'
 changed = require 'gulp-changed'
-
 minimatch = require 'minimatch'
 ternaryStream = require 'ternary-stream'
 
-preprocessPath = require '../common/preprocessPath'
+module.exports = (DSGulpBuilder) ->
 
-{tooManyArgs, missingArg, unsupportedOption, invalidOptionType} = TaskBase = require '../common/TaskBase'
+  {invalidArg, tooManyArgs, missingArg, unsupportedOption, invalidOptionType, preprocessPath} = TaskBase = DSGulpBuilder.TaskBase
 
-module.exports =
-
-  class Jade extends TaskBase
+  class Pug extends TaskBase
 
     constructor: ((task, @_src, opts) ->
       missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 3
       TaskBase.call @, task
       throw new Error 'Invalid source file or directory name (1st argument)' unless typeof @_src == 'string' && @_src != ''
-      {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*.+(jade|html)"
+      {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*.+(pug|jade|html)"
       if arguments.length > 2
         if (ok = typeof opts == 'object')
           for k, v of opts
@@ -73,8 +65,8 @@ module.exports =
         p = GLOBAL.gulp.src @_fixedSrc
         p = @_countFiles p
         p = p.pipe(ternaryStream(((file) ->
-              minimatch(file.relative, '**/*.jade')),
-            jade(locals: locals)))
+              minimatch(file.relative, '**/*.+(pug|jade)')),
+            pug(locals: locals)))
         p = @_onError p, 'finish'
 
         if (dupMap = @_dupMap)
@@ -95,3 +87,14 @@ module.exports =
 
       @_built = true
       return @_name)
+
+# ----------------------------
+
+  DSGulpBuilder.Task::pug = DSGulpBuilder.Task::jade = ->
+    newInstance = Object.create(Pug::)
+    args = [@]
+    args.push arg for arg in arguments
+    Pug.apply newInstance, args
+    return newInstance
+
+  return    

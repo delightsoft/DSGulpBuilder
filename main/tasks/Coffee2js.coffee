@@ -1,8 +1,9 @@
 path = require 'path'
-gutil = require 'gulp-util'
-rename = require 'gulp-rename'
-through = require 'through2'
+coffee = require 'gulp-coffee'
 changed = require 'gulp-changed'
+
+minimatch = require 'minimatch'
+ternaryStream = require 'ternary-stream'
 
 preprocessPath = require '../common/preprocessPath'
 
@@ -10,14 +11,14 @@ preprocessPath = require '../common/preprocessPath'
 
 module.exports =
 
-  class Copy extends TaskBase
+  class Coffee2JS extends TaskBase
 
     constructor: ((task, @_src) ->
       missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 2
       TaskBase.call @, task
       throw new Error 'Invalid source file or directory name (1st argument)' unless typeof @_src == 'string' && @_src != ''
-      {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*"
+      {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, '**/*.+(coffee|litcoffee|coffee.md|js)'
       return)
 
     @destMixin()
@@ -35,9 +36,12 @@ module.exports =
 
         p = GLOBAL.gulp.src @_fixedSrc
         p = @_countFiles p, true
-        p = p.pipe(changed(@_destFirstLocation))
-        p = @_dest p
+        p = p.pipe(ternaryStream(((file) ->
+          minimatch(file.relative, '**/*.+(coffee|litcoffee|coffee.md)')),
+          coffee(bare: true)))
         p = @_onError p, 'finish'
+        p = p.pipe(changed(@_destFirstLocation))
+        p = @_dest(p)
         p = @_endPipe p, 'finish', cb
 
         return false)
