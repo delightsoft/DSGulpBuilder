@@ -19,10 +19,16 @@ module.exports = ((gulpPath, defaultMask) ->
   throw Error 'too many arguments' unless arguments.length <= 2
 
   if glob.hasMagic gulpPath
+
+    gulpPath = gulpPath.substr 2 if gulpPath.startsWith './' # ensure, what gulp.watch will see new added files
+
     return {path: gulpPath, single: false}
 
+  fullPath = path.resolve (cwd = process.cwd()), gulpPath # ensure, what gulp.watch will see new added files
+  gulpPath = path.relative cwd, fullPath
+
   try
-    if (stat = fs.statSync path.resolve process.cwd(), gulpPath).isDirectory()
+    if (stat = fs.statSync fullPath).isDirectory()
       pathWithMask =
         (if gulpPath.charAt(gulpPath.length - 1) != '/' then gulpPath else gulpPath.substr 0, gulpPath.length - 1) +
         (if defaultMask then (if defaultMask.charAt(0) == '/' then defaultMask else '/' + defaultMask) else '/**/*')

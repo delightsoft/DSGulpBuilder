@@ -25,7 +25,9 @@ module.exports =
             require(taskNPM)(clazz::_DSGulpBuilder)
             (clazz::[taskName]).apply @, arguments # clazz::[taskName] = ->
           catch err
-            if err.message.indexOf('Cannot find module') >= 0              
+            console.info 'err:', err
+            console.info 'err:', err.stackTrace
+            if err.message.indexOf('Cannot find module') >= 0
               clazz.missingModules.push taskNPM unless clazz.missingModules.indexOf(taskNPM) >= 0
               new StubTask taskName # clazz::[taskName] = ->
             else

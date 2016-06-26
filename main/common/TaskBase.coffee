@@ -4,6 +4,10 @@ rename = require 'gulp-rename'
 (notify = require 'gulp-notify').logger (->)
 through = require 'through2'
 
+resolve = undefined
+coverageDone = new Promise (_resolve) -> resolve = _resolve; return
+resolve()
+
 class TaskBase
 
   constructor: ((nameOrTask, @_deps) ->
@@ -27,6 +31,11 @@ class TaskBase
     @_watch = false
     @_mixinInit?()
     return)
+
+  @onCoverageDone = (action) ->
+    [oldCoverageDone, coverageDone] = [coverageDone, new Promise (_resolve) -> resolve = _resolve; return]
+    oldCoverageDone.then action
+    resolve
 
   _mixinInit: null
 
