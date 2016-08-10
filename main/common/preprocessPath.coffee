@@ -18,13 +18,13 @@ module.exports = ((gulpPath, defaultMask) ->
   throw Error 'invalid 2nd arg' unless arguments.length == 1 || typeof defaultMask == 'string'
   throw Error 'too many arguments' unless arguments.length <= 2
 
+  gulpPath = gulpPath.substr n + 1 if 0 <= (n = gulpPath.indexOf '/') < 2 # ensure, what gulp.watch will see new added files
+
   if glob.hasMagic gulpPath
-
-    gulpPath = gulpPath.substr 2 if gulpPath.startsWith './' # ensure, what gulp.watch will see new added files
-
     return {path: gulpPath, single: false}
 
   fullPath = path.resolve (cwd = process.cwd()), gulpPath # ensure, what gulp.watch will see new added files
+
   gulpPath = path.relative cwd, fullPath
 
   try

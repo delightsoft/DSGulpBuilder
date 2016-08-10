@@ -10,7 +10,7 @@ resolve()
 
 class TaskBase
 
-  constructor: ((nameOrTask, @_deps) ->
+  constructor: (nameOrTask, @_deps) ->
     if nameOrTask instanceof TaskBase # copy constructor
       @_name = nameOrTask._name
       @_deps = nameOrTask._deps
@@ -30,39 +30,39 @@ class TaskBase
     @_built = false
     @_watch = false
     @_mixinInit?()
-    return)
+    return # (nameOrTask, @_deps) ->
 
   @onCoverageDone = (action) ->
     [oldCoverageDone, coverageDone] = [coverageDone, new Promise (_resolve) -> resolve = _resolve; return]
     oldCoverageDone.then action
-    resolve
+    resolve # @onCoverageDone
 
   _mixinInit: null
 
   _mixinAssert: null
 
-  _isAlreadyBuilt: (->
+  _isAlreadyBuilt: ->
     throw new Error('Task is already built.  Modification is not allowed') if @_built
-    return)
+    return # _isAlreadyBuilt:
 
-  _build: (-> # it's anstract method with stub code
+  _build: -> # it's abstract method with stub code
     throw new Error("Definition of task '#{@_name}' is not completed")
-    return)
+    return # _build:
 
-  _countFiles: ((p, doNotSkipIncludeFiles) ->
+  _countFiles: (p, doNotSkipIncludeFiles) ->
     @_filesCnt = 0
-    return p.pipe(through.obj((file, enc, cb) =>
+    return p.pipe(through.obj (file, enc, cb) =>
       # count found files
       @_filesCnt++
       # skip files with name started with underscore
       cb null, if !doNotSkipIncludeFiles && !@_singleFile && path.basename(file.path).indexOf('_') == 0 then null else file
-      return))
-    return)
+      return) # (file, enc, cb) =>
+    return # _countFiles:
 
-  _onError: ((p, endOrFinish, doNotEmitEvent) ->
+  _onError: (p, endOrFinish, doNotEmitEvent) ->
     self = @
     delete @_err # clear from previous use
-    return p.on 'error', ((err) ->
+    p.on 'error', (err) -> # _onError:
       args = Array::slice.call arguments
       notify.onError(
         title: "Task '#{self._name}': Error"
@@ -71,37 +71,37 @@ class TaskBase
       self._err = err
       console.error err.stack
       @emit endOrFinish unless doNotEmitEvent
-      return))
+      return # (err) ->
 
-  _endPipe: ((p, endOrFinish, cb, ignoreSecondEnd) ->
+  _endPipe: (p, endOrFinish, cb, ignoreSecondEnd) ->
     endHappend = false
-    return p.on endOrFinish, ((err) =>
+    p.on endOrFinish, (err) => # _endPipe:
       if @hasOwnProperty '_filesCnt' && @_filesCnt == 0
         gutil.log gutil.colors.red "Task '#{@_name}': Nothing is found for source '#{@_src}' (#{path.resolve process.cwd(), @_fixedSrc})"
       unless endHappend && ignoreSecondEnd
         cb(if @_err then new gutil.PluginError @_name, @_err else null)
       endHappend = true
-      return))
+      return # (err) =>
 
-  _setWatch: ((cb, initWatch) ->
-    return if @_watch
+  _setWatch: (cb, initWatch) ->
+    if @_watch # _setWatch:
       cb
     else
-      ((err) =>
+      (err) =>
         initWatch()
         @_watch = true
         cb err
-        return))
+        return # (err) =>
 
   # Hack: I collect all watches right on the TaskBase class method
-  @addToWatch = ((watch) ->
+  @addToWatch = (watch) ->
     [oldWatchTask, @_watchTask] = [@_watchTask, (->
       oldWatchTask?.call @
       watch()
       return)]
-    return)
+    return # @addToWatch
 
-  @destMixin = (->
+  @destMixin = ->
 
     [oldMixinInit, @::_mixinInit] = [@::_mixinInit, (->
       oldMixinInit?.call @
@@ -114,7 +114,7 @@ class TaskBase
         throw new Error "Task '#{@_name}': dest is not specified"
       return)]
 
-    @::dest = ((locations) ->
+    @::dest = (locations) ->
       @_isAlreadyBuilt()
       throw new Error('Missing argument') if arguments.length == 0
       throw new Error('Too many arguments') if arguments.length > 1
@@ -124,7 +124,9 @@ class TaskBase
         break unless (ok = typeof location == 'string' && location != '')
       throw new Error 'First argument must be either a string or list of strings' if !ok
 
-      @_dest = if (locations = (if Array.isArray locations then locations else [locations])).length == 1
+      (locations[i] = v.substr n + 1 if 0 <= (n = v.indexOf '/') < 2) for v, i in (locations = if Array.isArray locations then locations else [locations])
+
+      @_dest = if locations.length == 1
         ((src) =>
           return src.pipe(GLOBAL.gulp.dest(locations[0])))
       else
@@ -149,9 +151,9 @@ class TaskBase
 
       @_destFirstLocation = locations[0]
 
-      return @)
+      return @ # @::dest
 
-    @::rename = ((opts) ->
+    @::rename = (opts) ->
       throw new Error('Missing argument') if arguments.length == 0
       throw new Error('Too many arguments') if arguments.length > 1
       @_isAlreadyBuilt()
@@ -173,9 +175,9 @@ class TaskBase
           if not typeof v == 'String'
             throw new Error "Option '#{k}': must be a string"
       throw new Error 'Frist argument must be either a string or options (name, ext, path)' if !ok
-      return @)
+      return @ # @::rename
 
-    return)
+    return # @destMixin
 
 # ----------------------------
 

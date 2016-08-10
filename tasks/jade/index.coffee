@@ -12,10 +12,10 @@ module.exports = (DSGulpBuilder) ->
 
   class Jade extends TaskBase
 
-    constructor: ((task, @_src, opts) ->
+    constructor: (task, @_src, opts) ->
       missingArg() if arguments.length < 2
       tooManyArgs() if arguments.length > 3
-      TaskBase.call @, task
+      super task
       throw new Error 'Invalid source file or directory name (1st argument)' unless typeof @_src == 'string' && @_src != ''
       {path: @_fixedSrc, single: @_singleFile} = preprocessPath @_src, "**/*.+(jade|html)"
       if arguments.length > 2
@@ -27,7 +27,6 @@ module.exports = (DSGulpBuilder) ->
                 @_locals = v
               else unsupportedOption k
         throw new Error 'Invalid options (2nd argument)' unless ok
-      return)
 
     @destMixin()
 
@@ -43,9 +42,9 @@ module.exports = (DSGulpBuilder) ->
           for v in toFilename when not typeof v == 'string'
             throw new Error 'duplicate() 3: Invalid argument dupMap'
       @_dupMap = dupMap
-      @
+      @ # duplicate:
 
-    _build: (->
+    _build: ->
       return @_name if @_built
 
       @_mixinAssert?()
@@ -54,14 +53,14 @@ module.exports = (DSGulpBuilder) ->
         GLOBAL.gulp.watch @_fixedSrc, [@_name]
         return)
 
-      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
+      GLOBAL.gulp.task @_name, @_deps, (cb) =>
 
-        locals = 
+        locals =
           dev: !!gutil.env.dev
           min: if gutil.env.dev then '' else '.min'
 
-        locals = ramda.merge locals, @_locals if @_locals
-        
+        if @_locals then locals[k] = v for k, v in @_locals
+
         p = GLOBAL.gulp.src @_fixedSrc
         p = @_countFiles p
         p = p.pipe(ternaryStream(((file) ->
@@ -79,14 +78,14 @@ module.exports = (DSGulpBuilder) ->
             cb null, file
             return
 
-        p = p.pipe(changed(@_destFirstLocation))
+        p = p.pipe changed @_destFirstLocation, hasChanged: changed.compareSha1Digest
         p = @_dest(p)
         p = @_endPipe p, 'finish', cb
 
-        return false)
+        return false # (cb) =>
 
       @_built = true
-      return @_name)
+      return @_name # _build:
 
 # ----------------------------
 

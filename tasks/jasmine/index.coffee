@@ -93,10 +93,10 @@ module.exports = (DSGulpBuilder) ->
     watch: ((path) ->
       invalidOptionType('dest', 'string or list of strings') unless Array.isArray(path) || (typeof path == 'string' && path.trim() != '')
       if typeof path == 'string'
-        path = path.substr 2 if path.startsWith './' # ensure, what gulp.watch will see new added files
+        path = path.substr n + 1 if 0 <= (n = gulpPath.indexOf '/') < 2 # ensure, what gulp.watch will see new added files
       else
-        for p, i in path when p.startsWith './' # ensure, what gulp.watch will see new added files
-          path[i] = p.substr 2
+        for p, i in path when 0 <= (n = p.indexOf '/') < 2 # ensure, what gulp.watch will see new added files
+          path[i] = p.substr n + 1
       @_watchSrc = path
 
       return @)
@@ -112,20 +112,6 @@ module.exports = (DSGulpBuilder) ->
           @_taskVer++
           delete @_coverageCach[ev.path]
           GLOBAL.gulp.start [@_name]
-#          switch ev.type
-#            when 'added', 'changed'
-#              if @_modified == null
-#                @_modified = undefined
-#                console.info 'ev:', ev
-#                stat = fs.lstat ev.path, (err, stats) =>
-#                  console.info 'stats: ', stats
-#                  @_modified = stats.mtime
-#                  console.info 'here'
-#                  GLOBAL.gulp.start [@_name]
-#                  return
-#            when 'deleted'
-#              @_deleted[ev.path] = true
-#              GLOBAL.gulp.start [@_name] # TODO: ???
           return
         return # _build:
 
@@ -295,15 +281,6 @@ module.exports = (DSGulpBuilder) ->
           return
 
       p = @_countFiles p
-
-#      if @_modified
-#        p = p.pipe through.obj do (modified = @_modified) -> (file, enc, cb) ->
-#          if file.stat.mtime >= modified
-#            cb null, file
-#          else
-#            cb()
-#          return
-#        @_modified = null
 
       jasmine = new JasmineRunner
 

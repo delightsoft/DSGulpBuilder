@@ -2,15 +2,7 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/main/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tasks/browserify/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tasks/browsersync/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tasks/jade/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tasks/jasmine/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tasks/ngjade2js/node_modules" />
-      <excludeFolder url="file://$MODULE_DIR$/tasks/sass/node_modules" />
-    </content>
+    <content url="file://$MODULE_DIR$" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

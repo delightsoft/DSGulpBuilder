@@ -1,6 +1,6 @@
 {
   "name": "ds-gulp-builder-jade",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DelightSoft LLC gulpfile logic builder, which simplifies the process, keep code readable and lets avoid using separated configs, like gulp-starter project do..",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

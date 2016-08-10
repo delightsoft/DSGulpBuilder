@@ -40,7 +40,7 @@ module.exports = (DSGulpBuilder) ->
 
     @destMixin()
 
-    _build: (->
+    _build: ->
       return @_name if @_built
 
       @_mixinAssert?()
@@ -54,7 +54,7 @@ module.exports = (DSGulpBuilder) ->
         GLOBAL.gulp.watch watchList, [@_name]
         return)
 
-      GLOBAL.gulp.task @_name, @_deps, ((cb) =>
+      GLOBAL.gulp.task @_name, @_deps, (cb) =>
 
         sassOpts =
           sourceComments: "map"
@@ -65,26 +65,26 @@ module.exports = (DSGulpBuilder) ->
 
         p = GLOBAL.gulp.src @_fixedSrc
         p = @_countFiles p
-        p = p.pipe(sass(sassOpts))        
-        p = p.pipe(autoprefixer(browsers: ["last 10 version"]))
+        p = p.pipe sass sassOpts
+        p = p.pipe autoprefixer browsers: ["last 10 version"]
         p = @_onError p, 'finish'
 
         if @_debug
-          p.pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest))
+          p.pipe changed @_destFirstLocation, hasChanged: changed.compareSha1Digest
           p = @_dest p
 
         if @_minimize
-          p = p.pipe(cssNano())
-          .pipe(rename(extname: '.min.css'))
-          p = p.pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest)) if !@_debug
+          p = p.pipe cssNano()
+          .pipe rename extname: '.min.css'
+          if !@_debug then p = p.pipe changed @_destFirstLocation, hasChanged: changed.compareSha1Digest
           p = @_dest p
 
         p = @_endPipe p, 'finish', cb
         
-        return false)
+        return false # (cb) =>
 
       @_built = true
-      return @_name)
+      return @_name # build:
     
 # ----------------------------
 
@@ -95,4 +95,4 @@ module.exports = (DSGulpBuilder) ->
     Sass.apply newInstance, args
     return newInstance
 
-  return
+  return # module.exports =

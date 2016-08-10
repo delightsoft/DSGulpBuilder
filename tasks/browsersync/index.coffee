@@ -51,10 +51,13 @@ module.exports = (DSGulpBuilder) ->
             # We're serving the src folder as well
             # for sass sourcemap linking
             baseDir: [@_src]
+#          watchOptions: {
+#            ignoreInitial: true,
+#            ignored: '*.map'
+#          }
           files: [
-            "#{@_src}/**"
-            # Exclude Map files
-            "!#{@_src}/**.map"
+            "#{@_src}/**/*"
+            #"**/*"
           ]
           middleware: ((req, res, next) =>
             if req.headers.accept?.indexOf('text/html') >= 0

@@ -1,6 +1,6 @@
 {
   "name": "ds-gulp-builder-pug",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "DelightSoft LLC gulpfile logic builder, which simplifies the process, keep code readable and lets avoid using separated configs, like gulp-starter project do..",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,9 +23,9 @@
   "homepage": "https://github.com/delightsoft/DSGulpBuilder#readme",
   "dependencies": {
     "gulp-changed": "^1.3.0",
-    "gulp-pug": "^3.0.3",
     "gulp-util": "^3.0.7",
     "minimatch": "^3.0.0",
+    "pug": "^2.0.0-beta4",
     "ternary-stream": "^2.0.0",
     "through2": "^2.0.0"
   }

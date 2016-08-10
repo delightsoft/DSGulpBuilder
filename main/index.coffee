@@ -28,9 +28,9 @@ module.exports = (gulp) ->
 
     task: ((taskname, deps) -> new Task(taskname, deps))
 
-    async: ((tasks, name) -> gulpsync.async turnTasksToNames(tasks), name)
+    async: ((tasks, name) -> if Task.missingModules.length == 0 then gulpsync.async turnTasksToNames(tasks), name)
 
-    sync: ((tasks, name) -> gulpsync.sync turnTasksToNames(tasks), name)
+    sync: ((tasks, name) -> if Task.missingModules.length == 0 then gulpsync.sync turnTasksToNames(tasks), name)
 
     go: ((tasks) ->
 

@@ -62,9 +62,9 @@ module.exports = (DSGulpBuilder) ->
         p = @_onError p, 'finish'
 
         if @_debug
-          p = p.pipe(source(@_src)) # for some reason, bundler do not translate source name from 'entries' parameter
-          .pipe(rename(extname: '.js'))
-          .pipe(changed(@_destFirstLocation, hasChanged: changed.compareSha1Digest))
+          p = p.pipe source @_src # for some reason, bundler do not translate source name from 'entries' parameter
+          .pipe rename extname: '.js'
+          .pipe changed @_destFirstLocation, hasChanged: changed.compareSha1Digest
           p = @_dest(p)
 
         if @_min
