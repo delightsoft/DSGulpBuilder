@@ -13,7 +13,7 @@ newTask = (taskClass) ->
 module.exports =
 
   class Task extends TaskBase
-    
+
     clazz = @
     
     @missingModules = []

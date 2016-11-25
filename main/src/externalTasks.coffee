@@ -15,6 +15,7 @@ modules =
   'browserSync': 'ds-gulp-builder-browser-sync'
   'jasmine': 'ds-gulp-builder-jasmine'
   'ngJade2JS': 'ds-gulp-builder-ng-jade2js'
+  'coffee2js': 'ds-gulp-builder-coffee2js'
 
 #  'sass': 'C:\\GIT\\DSGulpBuilder\\tasks\\sass'
 #  'jade': 'C:\\GIT\\DSGulpBuilder\\tasks\\jade'
@@ -23,10 +24,10 @@ modules =
 #  'browserSync': 'C:\\GIT\\DSGulpBuilder\\tasks\\browserSync'
 #  'jasmine': 'C:\\GIT\\DSGulpBuilder\\tasks\\jasmine'
 #  'ngJade2JS': 'C:\\GIT\\DSGulpBuilder\\tasks\\ngjade2js'
+#  'coffee2js': 'C:\\GIT\\DSGulpBuilder\\tasks\\coffee2js'
 
 # ----------------------------  
   
 module.exports =
   StubTask: StubTask
   modules: modules
-  

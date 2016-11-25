@@ -14,7 +14,7 @@ turnTasksToNames = ((tasks) ->
   throw new Error 'Invalid list of tasks' if !ok
   return tasks)
 
-module.exports = (gulp) ->
+module.exports = (gulp, noWatchFunc) ->
 
   GLOBAL.gulp = gulp
   gutil = require 'gulp-util'
@@ -45,7 +45,7 @@ module.exports = (gulp) ->
         return
 
       tasks = turnTasksToNames(tasks)
-      if TaskBase._watchTask
+      if (!noWatchFunc || !noWatchFunc()) && TaskBase._watchTask
         gulp.task 'watch', TaskBase._watchTask
         tasks.push 'watch'
       gulp.task 'default', tasks)
