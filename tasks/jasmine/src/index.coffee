@@ -108,14 +108,14 @@ module.exports = (DSGulpBuilder) ->
       @_mixinAssert?()
 
       TaskBase.addToWatch =>
-        GLOBAL.gulp.watch [@_fixedSrc, @_watchSrc], (ev) =>
+        global.gulp.watch [@_fixedSrc, @_watchSrc], (ev) =>
           @_taskVer++
           delete @_coverageCach[ev.path]
-          GLOBAL.gulp.start [@_name]
+          global.gulp.start [@_name]
           return
         return # _build:
 
-      GLOBAL.gulp.task @_name, @_deps, task = (cb) =>
+      global.gulp.task @_name, @_deps, task = (cb) =>
         currTaskVer = @_taskVer
         if @_coverage
           [@istanbul, missing] = optionalRequired ['istanbul']
@@ -162,7 +162,7 @@ module.exports = (DSGulpBuilder) ->
       return
 
     _coverCleanUp: (cb) ->
-      delete GLOBAL.__COVERAGE__
+      delete global.__COVERAGE__
       for ext, process of @_prevExt
         if process
           Module._extensions[ext] = process
@@ -253,7 +253,7 @@ module.exports = (DSGulpBuilder) ->
     _generateCoverageReport: (cb) ->
 
       collector = new (@istanbul.Collector)
-      collector.add GLOBAL.__COVERAGE__
+      collector.add global.__COVERAGE__
       finalSummary = @istanbul.utils.mergeSummaryObjects.apply(null, collector.files().map((F) =>
         @istanbul.utils.summarizeFileCoverage collector.fileCoverageFor(F)
       ))
@@ -269,7 +269,7 @@ module.exports = (DSGulpBuilder) ->
 
       src = path.join process.cwd(), @_fixedSrc
 
-      p = GLOBAL.gulp.src src, read: false
+      p = global.gulp.src src, read: false
       
       if @_filter
         p = p.pipe through.obj (file, enc, cb) =>

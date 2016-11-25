@@ -28,6 +28,9 @@ module.exports = (DSGulpBuilder) ->
               when 'debug'
                 invalidOptionType k, 'boolean' unless typeof v == 'boolean'
                 @_debug = v
+              when 'ext'
+                invalidOptionType k, 'object' unless typeof v == 'object'
+                @_ext = v
               else unsupportedOption k
         throw new Error 'Invalid options (2nd argument)' unless ok
       return)
@@ -51,12 +54,16 @@ module.exports = (DSGulpBuilder) ->
           cache: {}
           packageCache: {}
           fullPaths: false
-          extensions: ['.coffee']
+          extensions: if @_ext then @_ext.fileExt else []
           entries: @_src
           debug: false)
+        if @_ext then bundler.transform @_ext.transforms
+
         bundler = watchify(bundler, ignoreWatch: true)
-        .on "update", (=> GLOBAL.gulp.start @_name; return)
-        .transform(require('coffeeify'))
+        .on "update", (=>
+          console.info 'update'
+          global.gulp.start @_name
+          return)
 
         p = bundler.bundle()
         p = @_onError p, 'finish'

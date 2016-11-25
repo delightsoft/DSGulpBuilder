@@ -1,10 +1,13 @@
 {
   "name": "ds-gulp-builder-sass",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "DelightSoft LLC gulpfile logic builder, which simplifies the process, keep code readable and lets avoid using separated configs, like gulp-starter project do..",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "coffee -c -o ./lib ./src",
+    "prepublish": "npm run build"
   },
+  "main": "./lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/delightsoft/DSGulpBuilder"
@@ -27,5 +30,8 @@
     "gulp-cssnano": "^2.1.0",
     "gulp-autoprefixer": "^3.1.0",
     "gulp-changed": "^1.3.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.11.1"
   }
 }

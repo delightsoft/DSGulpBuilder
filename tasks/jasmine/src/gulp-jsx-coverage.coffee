@@ -69,7 +69,7 @@ addSourceComments = (source, sourceMap, filename) ->
 initModuleLoaderHack = (options) ->
   Module = require('module')
   istanbul = require(if options.isparta then 'isparta' else 'istanbul')
-  instrumenter = new (istanbul.Instrumenter)(Object.assign(if options.isparta then babelOptions: options.babel else {}, options.istanbul))
+  instrumenter = new (istanbul.Instrumenter)(Object.assign((if options.isparta then babelOptions: options.babel else {}), options.istanbul))
   babelFiles = Object.assign({
     include: /\.jsx?$/
     exclude: /node_modules/

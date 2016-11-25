@@ -1,10 +1,13 @@
 {
   "name": "ds-gulp-builder-jasmine",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "DelightSoft LLC gulpfile logic builder, which simplifies the process, keep code readable and lets avoid using separated configs, like gulp-starter project do..",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "coffee -c -o ./lib ./src",
+    "prepublish": "npm run build"
   },
+  "main": "./lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/delightsoft/DSGulpBuilder"
@@ -28,5 +31,8 @@
     "jasmine-terminal-reporter": "^1.0.1",
     "minimatch": "^3.0.0",
     "through2": "^2.0.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.11.1"
   }
 }

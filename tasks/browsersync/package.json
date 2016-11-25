@@ -1,10 +1,13 @@
 {
   "name": "ds-gulp-builder-browser-sync",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "DelightSoft LLC gulpfile logic builder, which simplifies the process, keep code readable and lets avoid using separated configs, like gulp-starter project do..",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "coffee -c -o ./lib ./src",
+    "prepublish": "npm run build"
   },
+  "main": "./lib/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/delightsoft/DSGulpBuilder"
@@ -23,5 +26,8 @@
   "homepage": "https://github.com/delightsoft/DSGulpBuilder#readme",
   "dependencies": {
     "browser-sync": "^2.10.0"
+  },
+  "devDependencies": {
+    "coffee-script": "^1.11.1"
   }
 }

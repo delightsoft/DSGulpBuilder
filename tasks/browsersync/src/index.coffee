@@ -88,7 +88,7 @@ module.exports = (DSGulpBuilder) ->
                   console.log "new url: #{req.url}"
             next())
 
-      GLOBAL.gulp.task @_name, (->
+      global.gulp.task @_name, (->
         browserSync config
         return)
 
